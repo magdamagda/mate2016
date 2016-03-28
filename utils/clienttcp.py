@@ -17,3 +17,4 @@ def tcpConnection(host, port, message):
     if not received is None:
         return format(received)
     return None
+

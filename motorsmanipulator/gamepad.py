@@ -1,23 +1,18 @@
 import pygame
+import time
 from PyQt4.QtCore import QThread, pyqtSignal
-from servers import clienttcp
+
+PAD_INTERVAL = 0.05
 
 class joystickThread(QThread):
 
-    buttonPushed = pyqtSignal(int)
-    buttonReleased = pyqtSignal(int)
-    axisMoved = pyqtSignal(int, float)
+    newState = pyqtSignal(dict, dict)
 
     def __init__(self, parent=None):
         super(joystickThread, self).__init__(parent)
-        self.EVENTS = {
-            pygame.JOYBUTTONUP : lambda event: self.buttonPushedHandler(event),
-            pygame.JOYAXISMOTION : lambda event: self.axisMovedHandler(event),
-        }
-        self.axisDict={}
-        self.axisMovedCounter = 0
-        self.axisFun = None
-        self.buttonsFun = None
+        self.buttonsState = {}
+        self.axesState = {}
+        self.changedState = False
         self.my_joystick = None
         self.stop = False
 
@@ -27,38 +22,51 @@ class joystickThread(QThread):
         if pygame.joystick.get_count() > joystickNum:
             self.my_joystick = pygame.joystick.Joystick(joystickNum)
             self.my_joystick.init()
+            self.stop = False
         else:
             raise Exception("Joystick not connected")
 
     def finish(self):
+        self.stop = True
         self.my_joystick = None
-        self.terminate()
 
     def run(self):
         print "running"
-        if self.my_joystick is not None and not self.stop:
-            while True:
-                self.g_keys = pygame.event.get()
+        if self.my_joystick is not None:
+            while not self.stop:
+                self.changedState = False
+                self.readButtonsState()
+                self.readAxesState()
+                if self.changedState:
+                    self.newState.emit(self.buttonsState, self.axesState)
+                time.sleep(PAD_INTERVAL)
+
+                """self.g_keys = pygame.event.get()
                 for event in self.g_keys:
                     if event.type in self.EVENTS:
-                        self.EVENTS[event.type](event)
+                        self.EVENTS[event.type](event)"""
         else:
             raise Exception("Joystick not connected")
 
+    def setButtons(self, list):
+        for item in list:
+            self.buttonsState[item] = 0
 
-    def axisMovedHandler(self, event):
-        if self.axisMovedCounter==0:
-            if not self.axisFun is None:
-                self.axisFun(event.axis, event.value)
-            """if event.axis in self.axisDict:
-                frame = "(" + str(self.axisDict[event.axis]) + ",S," + str(event.value) + ")"
-                response = clienttcp.tcpConnection("localhost", 9998, frame)
-                if response is not None:
-                    self.axisMoved.emit(event.axis, event.value)"""
-            self.axisMovedCounter = 10
-        else:
-            self.axisMovedCounter-=1
+    def setAxes(self, list):
+        for item in list:
+            self.axesState[item] = 0
 
-    def buttonPushedHandler(self, event):
-        if not self.buttonsFun is None:
-            self.buttonsFun(event.button)
+    def readButtonsState(self):
+        for btn in self.buttonsState:
+            state = self.my_joystick.get_button(btn)
+            if state!=self.buttonsState[btn]:
+                self.buttonsState[btn] = state
+                self.changedState = True
+
+    def readAxesState(self):
+        for ax in self.axesState:
+            state = self.my_joystick.get_axis(ax)
+            if state!=self.axesState[ax]:
+                self.axesState[ax] = state
+                self.changedState = True
+

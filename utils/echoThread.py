@@ -2,13 +2,13 @@ from PyQt4.QtCore import *
 import time
 import frames
 
-class tcpThread(QThread):
+class echoThread(QThread):
 
     connectionState = pyqtSignal(bool)
     error = pyqtSignal(str)
 
     def __init__(self, parent=None, host = "localhost", port = 9998):
-        super(tcpThread, self).__init__(parent)
+        super(echoThread, self).__init__(parent)
         self.refresh = 10
         self.host = host
         self.port = port
@@ -17,7 +17,7 @@ class tcpThread(QThread):
     def run(self):
         print "running"
         while not self.connected:
-            print "get params"
+            print "echo thread"
             try:
                 self.connected = frames.echo(self.host, self.port)
                 self.connectionState.emit(self.connected)

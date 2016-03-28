@@ -26,10 +26,15 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         for frame in frames:
             frame = frame[0:-1]
             splitted = frame.split(",")
-            if len(splitted) == 2 and splitted[1] == "G": # get param
-                answer += "(" + splitted[0] + ",R," + str(randint(0, 50)) + ")"
-            elif len(splitted) == 3 and splitted[1] == "S": # get param
-                answer += "(" + splitted[0] + ",R," + "OK" + ")"
+            if splitted[0] == "G":
+                if splitted[1:3] == ["M", "*"] or splitted[1:3] == ["A", "*"] or splitted[1:4] == ["A", "s", "*"]:
+                    answer += "(R," + ",".join(splitted[1:]) + 4* ("," + str(randint(0, 50))) + ")"
+                else:
+                    answer += "(R," + ",".join(splitted[1:]) + "," + str(randint(0, 50)) + ")"
+            if splitted[0] == "S":
+                answer += "(R," + ",".join(splitted[1:]) + ")"
+            if splitted[0] == "?":
+                answer += "(R,OK)"
         return answer
 
 

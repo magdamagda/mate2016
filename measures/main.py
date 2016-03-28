@@ -8,21 +8,19 @@ from pygooglechart import Axis"""
 
 
 import mainGUI
-from servers import tcpThread
-import chart
+from utils import tcpThread
 
 # param name and unit
-paramsDict = {"T1" : "C", "T2" : "C", "T3" : "C"}
-paramsValues = {"T1" : [], "T2" : [], "T3" : []}
+paramsUnits = {"T" : "C", "P" : "Pa"}
+paramsList = [("T",), ("P")]
+paramsValues = {"T" : [], "P" : []}
 
-CHART_FILE = 'chart.png'
-
-class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
-    def __init__(self, parent = None):
+class MainWindow(mainGUI.Ui_MainWindow):
+    def __init__(self, host, port, parent = None):
         super(MainWindow, self).__init__(parent)
-        self.setupUi(self)
+        self.setupUi()
         self.addAllParams()
-        self.bgThread = tcpThread.tcpThread(self, paramsDict.keys())
+        self.bgThread = tcpThread.tcpThread(self, paramsList, host, port)
         self.bgThread.paramsRetrived.connect(self.updateValues)
         self.btnSave.clicked.connect(lambda : self.bgThread.setRefresh(self.spinBoxRefresh.value()))
         self.bgThread.start()
@@ -30,8 +28,8 @@ class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
     def addAllParams(self):
         x=0
         y=0
-        for p in paramsDict:
-            self.addParam(p, x, y)
+        for p in paramsList:
+            self.addParam(p[0], x, y)
             x+=1
             if x==4:
                 x=0
@@ -44,7 +42,7 @@ class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
         measureView.setSpacing(6)
         measureView.setObjectName("measureView" + name)
 
-        setattr(self, "labelName" + name, QLabel(self.layoutWidget))
+        setattr(self, "labelName" + name, QLabel())
         labelName = getattr(self, "labelName" + name)
         font = QFont()
         font.setPointSize(14)
@@ -53,7 +51,7 @@ class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
         labelName.setObjectName("labelName" + name)
         measureView.addWidget(labelName)
 
-        setattr(self, "labelValue" + name, QLabel(self.layoutWidget))
+        setattr(self, "labelValue" + name, QLabel())
         labelValue = getattr(self, "labelValue" + name)
         font = QFont()
         font.setFamily("Droid Sans")
@@ -74,7 +72,7 @@ class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
         measureView.setStretch(1, 3)
         self.measuresValues.addLayout(measureView, posY, posX, 1, 1)
 
-        setattr(self, "chartParam" + name, QCheckBox(self.layoutWidget))
+        setattr(self, "chartParam" + name, QCheckBox())
         chartParam = getattr(self, "chartParam" + name)
         sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -85,53 +83,24 @@ class MainWindow(QMainWindow, mainGUI.Ui_MainWindow):
         chartParam.setText(name)
         self.legend.addWidget(chartParam)
 
-    """def drawChart(self):
-        # Set the vertical range from 0 to 100
-        max_y = 100
-
-        # Chart size of 200x125 pixels and specifying the range for the Y axis
-        chart = SimpleLineChart(200, 125, y_range=[0, max_y])
-
-        for param in paramsValues:
-            data = paramsValues[param]
-            chart.add_data(data)
-
-        # Set the line colour to blue
-        chart.set_colours(['0000FF'])
-
-        # Set the vertical stripes
-        chart.fill_linear_stripes(Chart.CHART, 0, 'CCCCCC', 0.2, 'FFFFFF', 0.2)
-
-        # Set the horizontal dotted lines
-        chart.set_grid(0, 25, 5, 5)
-
-        # The Y axis labels contains 0 to 100 skipping every 25, but remove the
-        # first number because it's obvious and gets in the way of the first X
-        # label.
-        left_axis = list(range(0, max_y + 1, 25))
-        left_axis[0] = ''
-        chart.set_axis_labels(Axis.LEFT, left_axis)
-
-        # X axis labels
-        chart.set_axis_labels(Axis.BOTTOM, \
-            ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'])
-
-        chart.download(CHART_FILE)
-        pixmap = QPixmap(CHART_FILE)
-        self.chartPlaceholder.setPixmap(pixmap)"""
-
     def drawChart(self):
-        self.chartPlaceholder.update_figure()
+        self.chartPlaceholder.update_figure(paramsValues["T"], paramsValues["P"])
 
     def updateValues(self, params):
         print "update values"
+        print params
         for param in  params:
             labelValue = getattr(self, "labelValue" + param)
-            labelValue.setText(str(params[param]) + paramsDict[param])
+            labelValue.setText(str(params[param]) + paramsUnits[param])
             paramsValues[param].append(params[param])
-        #self.drawChart()
+        self.drawChart()
 
-app=QApplication(sys.argv)
-form = MainWindow()
-form.show()
-app.exec_()
+if __name__ == "__main__":
+    if len(sys.argv)>2:
+        HOST, PORT = sys.argv[1], int(sys.argv[2])
+    else:
+        HOST, PORT = "localhost", 9998
+    app=QApplication(sys.argv)
+    form = MainWindow(HOST, PORT)
+    form.show()
+    app.exec_()

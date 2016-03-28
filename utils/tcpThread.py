@@ -1,10 +1,12 @@
 from PyQt4.QtCore import *
 import time
 import clienttcp
+import frames
 
 class tcpThread(QThread):
 
     paramsRetrived = pyqtSignal(dict)
+    error = pyqtSignal(str)
 
     def __init__(self, parent=None, paramsList = [], host = "localhost", port = 9998):
         super(tcpThread, self).__init__(parent)
@@ -17,31 +19,15 @@ class tcpThread(QThread):
         print "running"
         while(1):
             print "get params"
-            params = self.getAllParams()
-            self.paramsRetrived.emit(params)
+            try:
+                params = frames.getAllParams(self.params, self.host, self.port)
+                print params
+                self.paramsRetrived.emit(params)
+            except Exception as e:
+                self.error.emit(str(e))
             time.sleep(self.refresh)
-
-    def getAllParams(self):
-        frames = ""
-        for p in self.params:
-            frames += "(" + p + ",G)"
-        print frames
-        response = clienttcp.tcpConnection(self.host, self.port, frames)
-        if response is not None:
-            return self.parseResponse(response)
-        return {}
 
     def setRefresh(self, value):
         print "set refresh"
         print value
         self.refresh = value
-
-    def parseResponse(self, response):
-        result = {}
-        frames = response.split("(")
-        for frame in frames:
-            frame = frame[0:-1]
-            splitted = frame.split(",")
-            if len(splitted) > 2:
-                result[splitted[0]] = int(splitted[2])
-        return result
