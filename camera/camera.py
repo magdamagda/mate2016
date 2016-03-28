@@ -3,8 +3,8 @@ import cv2
 
 #cap = cv2.VideoCapture("udpsrc port=1234 ! videoconvert ! appsink")
 print "start camera"
-cap = cv2.VideoCapture('udpsrc port=1234 ! capsfilter caps=video/x-raw,format=GRAY8 ! videoconvert ! appsink')
-#cap = cv2.VideoCapture('udpsrc port=1234 ! "application/x-rtp, payload=127" ! video/x-raw-rgb ! appsink')
+cap = cv2.VideoCapture('udpsrc port=1234 ! "application/x-rtp, payload=127" ! rtph264depay ! ffdec_h264 ! ffmpegcolorspace ! video/x-raw ! appsink')
+#cap = cv2.VideoCapture('udpsrc port=1234 ! "application/x-rtp, payload=127" ! appsink')
 #cap = cv2.VideoCapture(0)
 
 while(cap.isOpened()):

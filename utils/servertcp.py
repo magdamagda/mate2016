@@ -28,6 +28,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
             splitted = frame.split(",")
             if len(splitted) == 2 and splitted[1] == "G": # get param
                 answer += "(" + splitted[0] + ",R," + str(randint(0, 50)) + ")"
+            elif len(splitted) == 3 and splitted[1] == "S": # get param
+                answer += "(" + splitted[0] + ",R," + "OK" + ")"
         return answer
 
 

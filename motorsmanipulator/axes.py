@@ -2,30 +2,39 @@ from OpenGL.GL import *
 from PyQt4 import QtGui
 from PyQt4.QtOpenGL import *
 
-class WfWidget(QGLWidget):
+class AxesWidget(QGLWidget):
     def __init__(self, parent = None):
-        super(WfWidget, self).__init__(parent)
+        super(AxesWidget, self).__init__(parent)
         self.xangle=0
         self.yangle=0
         self.zangle=0
 
     def paintGL(self):
-        glRotatef(30, 0.0, 1.0, 0.0)
-        glColor3f(0.0, 0.0, 1.0)
+        self.createRotation()
+        glLoadIdentity()
+        glColor3f(0.0, 0.0, 1.0)  # x
         glBegin(GL_LINES)
         glVertex3f(0, 0, 0)
         glVertex3f(20, 0, 0)
         glEnd()
-        glColor3f(1.0, 0.0, 0.0)
+        #self.createRotation()
+        glColor3f(1.0, 0.0, 0.0)  # z
         glBegin(GL_LINES)
         glVertex3f(0, 0, 0)
         glVertex3f(0, 0, 20)
         glEnd()
-        glColor3f(0.0, 1.0, 0.0)
+        #self.createRotation()
+        glColor3f(0.0, 1.0, 0.0)  # y
         glBegin(GL_LINES)
         glVertex3f(0, 0, 0)
         glVertex3f(0, 20, 0)
         glEnd()
+
+    def createRotation(self):
+        glRotate(self.xangle, 1.0, 0.0, 0.0)
+        glRotate(self.yangle, 0.0, 1.0, 0.0)
+        glRotate(self.zangle, 0.0, 0.0, 1.0)
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
     def resizeGL(self, w, h):
         glMatrixMode(GL_PROJECTION)
@@ -41,10 +50,10 @@ class WfWidget(QGLWidget):
         self.xangle=x
         self.yangle=y
         self.zangle=z
-        self.paintGL()
+        self.updateGL()
 
-if __name__ == '__main__':
+"""if __name__ == '__main__':
     app = QtGui.QApplication(["Winfred's PyQt OpenGL"])
     widget = WfWidget()
     widget.show()
-    app.exec_()
+    app.exec_()"""
