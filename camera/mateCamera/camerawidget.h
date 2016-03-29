@@ -14,6 +14,7 @@
 #include <QByteArray>
 #include <QNetworkInterface>
 #include "streamingthread.h"
+#include "opencv2/videoio.hpp"
 
 using namespace cv;
 
@@ -32,6 +33,8 @@ public:
     bool startRecording();
     bool isRecording();
     bool sharpen();
+    void startSavingToFile(QString file);
+    void stopSavingToFile();
 
 private:
     void setupUi();
@@ -49,6 +52,7 @@ private:
     int height;
     int fps;
     bool recording;
+    bool saving;
 
     int tcpPort;
     int udpPort;
@@ -58,10 +62,14 @@ private:
     QTcpSocket * tcpSocket;
     streamingThread* streaming;
 
+    cv::VideoWriter* videoWriter;
+    CvSize realImageSize;
+
 signals:
 
 public slots:
     void display(cv::Mat img);
+    void save(cv::Mat img);
     void startFrameResponse();
     void endFrameResponse();
     void setIPResponse();

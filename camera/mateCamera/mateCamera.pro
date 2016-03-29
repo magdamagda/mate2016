@@ -37,5 +37,6 @@ LIBS += -lopencv_objdetect
 LIBS += -lopencv_contrib
 LIBS += -lopencv_legacy
 LIBS += -lopencv_flann
+LIBS += -lopencv_videoio
 
 CONFIG += c++11

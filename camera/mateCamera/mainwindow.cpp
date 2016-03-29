@@ -6,6 +6,7 @@ MainWindow::MainWindow(QString host, int udpPort, int tcpPort, int num, int w, i
     ui(new Ui::MainWindow)
 {
     //ui->setupUi(this);
+    this->createContextMenu();
     this->setWindowTitle("Camera " + QString::number(num));
     centralWidget = new QWidget(this);
     this->setCentralWidget( centralWidget );
@@ -18,6 +19,34 @@ MainWindow::MainWindow(QString host, int udpPort, int tcpPort, int num, int w, i
 
 void MainWindow::closeEvent(QCloseEvent *event) {
 
+}
+
+void MainWindow::contextMenuEvent(QContextMenuEvent *event){
+    QMenu menu(this);
+    menu.addAction(startRec);
+    menu.addAction(stopRec);
+    menu.exec(event->globalPos());
+}
+
+void MainWindow::createContextMenu(){
+    this->startRec = new QAction(tr("&Start recording"), this);
+    connect(this->startRec, &QAction::triggered, this, &MainWindow::startRecording);
+
+    this->stopRec = new QAction(tr("&Stop recording"), this);
+    connect(this->stopRec, &QAction::triggered, this, &MainWindow::stopRecording);
+}
+
+void MainWindow::startRecording(){
+    if(camera->isRecording()){
+        QFileDialog dialog(this);
+        dialog.setFileMode(QFileDialog::AnyFile);
+        QString file = dialog.getSaveFileName(this, tr("Choose record directory"), "/home/");
+        camera->startSavingToFile(file);
+    }
+}
+
+void MainWindow::stopRecording(){
+    camera->stopSavingToFile();
 }
 
 MainWindow::~MainWindow()

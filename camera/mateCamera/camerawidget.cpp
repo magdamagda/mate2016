@@ -5,6 +5,7 @@ cameraWidget::cameraWidget(QString host, int udpPort, int tcpPort, int camNum, i
 {
     streaming=nullptr;
     recording = false;
+    saving = false;
     setupUi();
     setIP();
 }
@@ -17,7 +18,11 @@ void cameraWidget::setupUi(){
 
 void cameraWidget::display(Mat img)
 {
+    realImageSize = CvSize(img.cols, img.rows);
     cv::cvtColor(img, img, CV_RGB2BGR);
+    if(saving){
+        circle(img, Point(10,10), 5, Scalar(255, 0, 0));
+    }
     QImage qimage((uchar*)img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
     this->canvas->setPixmap(QPixmap::fromImage(qimage));
 }
@@ -159,8 +164,29 @@ bool cameraWidget::isRecording(){
     return recording;
 }
 
+
 bool cameraWidget::sharpen(){
 
+}
+
+void cameraWidget::startSavingToFile(QString file){
+    cout<<file.toStdString()<<endl;
+    videoWriter = new VideoWriter(file.toStdString(), CV_FOURCC('M','J','P','G'), this->fps, realImageSize);
+    if(videoWriter->isOpened()){
+        connect(streaming, SIGNAL(cameraRetrived(cv::Mat)),this, SLOT(save(cv::Mat)));
+        saving = true;
+    }
+}
+
+void cameraWidget::save(cv::Mat img){
+    cout<<"save"<<endl;
+    videoWriter->write(img);
+}
+
+void cameraWidget::stopSavingToFile(){
+    disconnect(streaming, SIGNAL(cameraRetrived(cv::Mat)),this, SLOT(save(cv::Mat)));
+    delete videoWriter;
+    saving = false;
 }
 
 cameraWidget::~cameraWidget(){

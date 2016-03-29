@@ -5,6 +5,9 @@
 #include <QString>
 #include <QVBoxLayout>
 #include <camerawidget.h>
+#include <QAction>
+#include <QContextMenuEvent>
+#include <QFileDialog>
 
 namespace Ui {
 class MainWindow;
@@ -20,12 +23,21 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event) Q_DECL_OVERRIDE;
+
+private slots:
+    void startRecording();
+    void stopRecording();
 
 private:
     Ui::MainWindow *ui;
     QWidget *centralWidget;
     QVBoxLayout* mainLayout;
     cameraWidget* camera;
+    void createContextMenu();
+
+    QAction* startRec;
+    QAction* stopRec;
 };
 
 #endif // MAINWINDOW_H
