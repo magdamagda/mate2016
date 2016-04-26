@@ -14,7 +14,7 @@ MainWindow::MainWindow(QString host, int udpPort, int tcpPort, int num, int w, i
     camera = new cameraWidget(host, udpPort, tcpPort, num, w, h, fps, this);
     mainLayout->addWidget(camera);
     //this->setLayout(layout);
-    camera->startRecording();
+    //camera->startRecording();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

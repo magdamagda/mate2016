@@ -1,6 +1,7 @@
+import sys
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-import sys
 
 """from pygooglechart import Chart
 from pygooglechart import SimpleLineChart
@@ -8,11 +9,11 @@ from pygooglechart import Axis"""
 
 
 import mainGUI
-from utils import tcpThread
+import tcpThread
 
 # param name and unit
 paramsUnits = {"T" : "C", "P" : "Pa"}
-paramsList = [("T",), ("P")]
+paramsList = ["T", "P"]
 paramsValues = {"T" : [], "P" : []}
 
 class MainWindow(mainGUI.Ui_MainWindow):
@@ -99,7 +100,7 @@ if __name__ == "__main__":
     if len(sys.argv)>2:
         HOST, PORT = sys.argv[1], int(sys.argv[2])
     else:
-        HOST, PORT = "localhost", 9998
+        HOST, PORT = "localhost", 6003
     app=QApplication(sys.argv)
     form = MainWindow(HOST, PORT)
     form.show()

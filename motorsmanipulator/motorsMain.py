@@ -1,7 +1,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 import sys
-from utils import tcpThread
 from motorsGUI import MotorsGUI
 import gamepad
 from utils import clienttcp, frames, echoThread

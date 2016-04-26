@@ -6,8 +6,12 @@ cameraWidget::cameraWidget(QString host, int udpPort, int tcpPort, int camNum, i
     streaming=nullptr;
     recording = false;
     saving = false;
+    lastConnection = nullptr;
+    tcpSocket = new QTcpSocket(this);
+    tcpSocket->connectToHost(this->host, this->tcpPort);
     setupUi();
     setIP();
+    cout<<this->udpPort<<endl;
 }
 
 void cameraWidget::setupUi(){
@@ -19,7 +23,7 @@ void cameraWidget::setupUi(){
 void cameraWidget::display(Mat img)
 {
     realImageSize = CvSize(img.cols, img.rows);
-    cv::cvtColor(img, img, CV_RGB2BGR);
+    //cv::cvtColor(img, img, CV_RGB2BGR);
     if(saving){
         circle(img, Point(10,10), 5, Scalar(255, 0, 0));
     }
@@ -29,9 +33,12 @@ void cameraWidget::display(Mat img)
 
 void cameraWidget::sendTCPframe(QString frame, const char* slot){
     QByteArray data = frame.toUtf8();
-    tcpSocket = new QTcpSocket(this);
-    connect(tcpSocket, SIGNAL(readyRead()),this, slot);
-    tcpSocket->connectToHost(this->host, this->tcpPort);
+    if (lastConnection!=nullptr){
+        disconnect(*lastConnection);
+        delete lastConnection;
+    }
+    lastConnection = new QMetaObject::Connection();
+    *lastConnection = connect(tcpSocket, SIGNAL(readyRead()),this, slot);
     if(!tcpSocket->waitForConnected(5000))
     {
         cout << tcpSocket->errorString().toStdString();
@@ -71,7 +78,7 @@ void cameraWidget::startFrameResponse(){
 
 void cameraWidget::startStreaming(){
     if (streaming == nullptr){
-        cout<<"start streaming"<<endl;
+        cout<<"start streaming"<<this->udpPort<<endl;
         streaming = new streamingThread(this->host, this->udpPort, this->camNum);
         qRegisterMetaType< cv::Mat >("cv::Mat");
         connect(streaming, SIGNAL(cameraRetrived(cv::Mat)),this, SLOT(display(cv::Mat)));
@@ -86,8 +93,11 @@ void cameraWidget::endFrameResponse(){
 }
 
 void cameraWidget::setIPResponse(){
+    cout<<"set ip response"<<endl;
     QByteArray data = tcpSocket->readAll();
     QString frame(data);
+    cout<<frame.toStdString()<<endl;
+    startRecording();
 }
 
 void cameraWidget::setSettingsResponse(){
@@ -175,6 +185,7 @@ void cameraWidget::startSavingToFile(QString file){
     if(videoWriter->isOpened()){
         connect(streaming, SIGNAL(cameraRetrived(cv::Mat)),this, SLOT(save(cv::Mat)));
         saving = true;
+        //this->lastImageRecord = time(nullptr);
     }
 }
 

@@ -24,6 +24,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
         answer=""
         frames = self.data.split("(")
         for frame in frames:
+            print str(frame)
             frame = frame[0:-1]
             splitted = frame.split(",")
             if splitted[0] == "G":
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     if len(sys.argv)>1:
         HOST, PORT = "localhost", int(sys.argv[1])
     else:
-        HOST, PORT = "localhost", 9998
+        HOST, PORT = "localhost", 6003
 
     print "starting server at " + HOST + " " + str(PORT)
 

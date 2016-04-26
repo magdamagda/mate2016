@@ -1,7 +1,7 @@
 from PyQt4.QtCore import *
 import time
-import clienttcp
-import frames
+import socket
+import utils.frames
 
 class tcpThread(QThread):
 
@@ -14,18 +14,27 @@ class tcpThread(QThread):
         self.params = paramsList
         self.host = host
         self.port = port
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def run(self):
         print "running"
+        self.sock.connect((self.host, self.port))
         while(1):
             print "get params"
+            params={}
             try:
-                params = frames.getAllParams(self.params, self.host, self.port)
-                print params
+                for p in self.params:
+                    print utils.frames.getParamFrame(p)
+                    self.sock.sendall(utils.frames.getParamFrame(p))
+                    received = self.sock.recv(1024)
+                    type, data = utils.frames.getFrameTypeAndData(received)
+                    params[str(type)] = float(data[0])
                 self.paramsRetrived.emit(params)
             except Exception as e:
+                print str(e)
                 self.error.emit(str(e))
             time.sleep(self.refresh)
+        self.sock.close()
 
     def setRefresh(self, value):
         print "set refresh"

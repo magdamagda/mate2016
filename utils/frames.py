@@ -20,9 +20,9 @@ def parseGetValuesResponse(response):
         frame = frame[1:]
         splitted = frame.split(",")
         if len(splitted) == 4:
-            result[splitted[1] + splitted[2]] = int(splitted[3])
+            result[splitted[1] + splitted[2]] = float(splitted[3])
         elif len(splitted) == 3:
-            result[splitted[1]] = int(splitted[2])
+            result[splitted[1]] = float(splitted[2])
         print result
     return result
 
@@ -32,6 +32,9 @@ def getParam(param, host, port):
     if response is not None:
         return parseGetValuesResponse(response)
     return None
+
+def getParamFrame(param):
+    return "(G," + param +")"
 
 def getAllParams(params, host, port):
     frames = ""
@@ -67,7 +70,7 @@ def getAllValues(host, port, param):
     return None
 
 def setAllValues(host, port, param, values):
-    response = clienttcp.tcpConnection(host, port, "(S," + param + ",*," + ",".join(values) + ")")
+    response = clienttcp.tcpConnection(host, port, "(S," + param + ",*," + ",".join([str(v) for v in values]) + ")")
     if response is not None:
         return parseGetAllValuesResponse(response)
     return None
@@ -79,7 +82,7 @@ def parseAxesVelocity(response):
     return [int(x) for x in splitted[4:]]
 
 def setAxesVelocity(host, port, values):
-    response = clienttcp.tcpConnection(host, port, "(S,A,s,*," + ",".join(values) + ")")
+    response = clienttcp.tcpConnection(host, port, "(S,A,s,*," + ",".join([str(v) for v in values]) + ")")
     if response is not None:
         return parseAxesVelocity(response)
     return None
@@ -89,3 +92,44 @@ def getAxesVelocity(host, port):
     if response is not None:
         return parseAxesVelocity(response)
     return None
+
+def getParamFrame(param):
+     return "(G," + param +")"
+
+def setParamFrame(param):
+    return "(S," + param + ")"
+
+def getAllValuesFrame(param):
+    return "(G," + param + ",*)"
+
+def setAllValuesFrame(param, values):
+    return "(S," + param + ",*," + ",".join([str(int(v)) for v in values]) + ")"
+
+def parseAxesVelocity(response):
+    checkError(response)
+    response = response[1:-1]
+    splitted = response.split(",")
+    return [int(x) for x in splitted[4:]]
+
+def setAxesVelocityFrame(values):
+    return "(S,A,s,*," + ",".join([str(v) for v in values]) + ")"
+
+def getAxesVelocityFrame():
+    return "(G,A,s,*)"
+
+def getFrameTypeAndData(frame):
+    if len(frame) < 5:
+        raise Exception("Too short frame")
+    if frame[1]=="E":
+        raise Exception(frame)
+    frame = frame[0:-1].split(",")
+    return frame[1], frame[2:]
+
+def changeModeFrame(mode):
+    return "(S,S,m," + str(mode) + ")"
+
+def uptimeFrame():
+    return "(G,S,t)"
+
+def outputStateFrame(num, state):
+    return "(S,O," + str(num) + "," + str(state) + ")"

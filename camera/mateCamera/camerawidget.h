@@ -15,6 +15,7 @@
 #include <QNetworkInterface>
 #include "streamingthread.h"
 #include "opencv2/videoio.hpp"
+#include <ctime>
 
 using namespace cv;
 
@@ -65,6 +66,9 @@ private:
     cv::VideoWriter* videoWriter;
     CvSize realImageSize;
 
+    QMetaObject::Connection* lastConnection;
+    //std::time_t lastImageRecord;
+
 signals:
 
 public slots:
@@ -75,6 +79,7 @@ public slots:
     void setIPResponse();
     void setSettingsResponse();
     bool stopRecording();
+
 };
 
 #endif // CAMERAWIDGET_H
