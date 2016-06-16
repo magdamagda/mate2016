@@ -54,7 +54,7 @@ void streamingThread::streamImage(){
                 emit cameraRetrived(frame);
                 free(longbuf);
 
-                cv::waitKey(1);
+                //cv::waitKey(1);
                 clock_t next_cycle = clock();
                 double duration = (next_cycle - last_cycle) / (double) CLOCKS_PER_SEC;
                cout << "\teffective FPS:" << (1 / duration) << " \tkbps:" << (PACK_SIZE * total_pack / duration / 1024 * 8) << endl;

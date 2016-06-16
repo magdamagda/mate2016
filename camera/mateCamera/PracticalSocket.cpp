@@ -34,6 +34,7 @@
 #endif
 
 #include <errno.h>             // For errno
+#include <string.h>
 
 using namespace std;
 

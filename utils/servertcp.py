@@ -23,8 +23,8 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     def generateFakeAnswer(self):
         answer=""
         frames = self.data.split("(")
-        for frame in frames:
-            print str(frame)
+        for frame in frames[1:]:
+            print "frame " + str(frame)
             frame = frame[0:-1]
             splitted = frame.split(",")
             if splitted[0] == "G":

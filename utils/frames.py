@@ -33,8 +33,8 @@ def getParam(param, host, port):
         return parseGetValuesResponse(response)
     return None
 
-def getParamFrame(param):
-    return "(G," + param +")"
+def getParamFrame(param, number):
+    return "(G,M," + param +"," + str(number) + ")"
 
 def getAllParams(params, host, port):
     frames = ""
@@ -93,9 +93,6 @@ def getAxesVelocity(host, port):
         return parseAxesVelocity(response)
     return None
 
-def getParamFrame(param):
-     return "(G," + param +")"
-
 def setParamFrame(param):
     return "(S," + param + ")"
 
@@ -114,6 +111,12 @@ def parseAxesVelocity(response):
 def setAxesVelocityFrame(values):
     return "(S,A,s,*," + ",".join([str(v) for v in values]) + ")"
 
+def setAxesGearFrame(values):
+    return "(S,A,g,*," + ",".join([str(v) for v in values]) + ")"
+
+def getAxesGearFrame():
+    return "(G,A,g,*)"
+
 def getAxesVelocityFrame():
     return "(G,A,s,*)"
 
@@ -125,6 +128,14 @@ def getFrameTypeAndData(frame):
     frame = frame[0:-1].split(",")
     return frame[1], frame[2:]
 
+def parseParamResponseFrame(frame):
+    if len(frame) < 5:
+        raise Exception("Too short frame")
+    if frame[1]=="E":
+        raise Exception(frame)
+    frame = frame[0:-1].split(",")
+    return frame[2], frame[3], frame[4]
+
 def changeModeFrame(mode):
     return "(S,S,m," + str(mode) + ")"
 
@@ -133,3 +144,6 @@ def uptimeFrame():
 
 def outputStateFrame(num, state):
     return "(S,O," + str(num) + "," + str(state) + ")"
+
+def zeroAxisFrame():
+    return "(S,S,c,z)"

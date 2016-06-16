@@ -2,19 +2,20 @@ import pygame
 import time
 from PyQt4.QtCore import QThread, pyqtSignal
 
-PAD_INTERVAL = 0.2
+PAD_INTERVAL = 0.15
 
 class joystickThread(QThread):
 
     newState = pyqtSignal(dict, dict)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, sensitivity = 0.3):
         super(joystickThread, self).__init__(parent)
         self.buttonsState = {}
         self.axesState = {}
         self.changedState = False
         self.my_joystick = None
         self.stop = False
+        self.sensitivity = sensitivity
 
     def init(self, joystickNum):
         pygame.init()
@@ -67,9 +68,10 @@ class joystickThread(QThread):
     def readAxesState(self):
         for ax in self.axesState:
             state = self.my_joystick.get_axis(ax)
-            if state < 0.2 and state > -0.2:
+            if (state < self.sensitivity and state > -self.sensitivity) or ax in [2,5]:
                 state = 0
-            if state!=self.axesState[ax]:
+            #if state!=self.axesState[ax]:
+            if state!=0 or state!=self.axesState[ax]:
                 self.axesState[ax] = state
                 self.changedState = True
 

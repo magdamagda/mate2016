@@ -41,12 +41,12 @@ class ControlGUI(QDialog):
 
         self.measuresValues = QGridLayout()
 
-        self.addLabel("M1", 0, 0, font, self.measuresValues)
-        self.addLabel("M2", 0, 1, font, self.measuresValues)
-        self.addLabel("M3", 1, 0, font, self.measuresValues)
-        self.addLabel("M4", 1, 1, font, self.measuresValues)
+        self.addLabel("M0", 0, 0, font, self.measuresValues)
+        self.addLabel("M3", 0, 1, font, self.measuresValues)
+        self.addLabel("M1", 1, 0, font, self.measuresValues)
+        self.addLabel("M2", 1, 1, font, self.measuresValues)
         self.addLabel("M5", 2, 0, font, self.measuresValues)
-        self.addLabel("M6", 2, 1, font, self.measuresValues)
+        self.addLabel("M4", 2, 1, font, self.measuresValues)
 
         layout.addItem(self.measuresValues)
 
@@ -107,13 +107,17 @@ class ControlGUI(QDialog):
         self.addAxeLayout(axesLayout, 0)
         self.addAxeLayout(axesLayout, 1)
         self.addAxeLayout(axesLayout, 2)
-        #self.addAxeLayout(axesLayout, 3)
+        self.addAxeLayout(axesLayout, 3)
 
         layout.addItem(axesLayout)
 
         self.saveValuesBtn = QPushButton()
-        self.saveValuesBtn.setText("Save values")
+        self.saveValuesBtn.setText("Save velocity")
         layout.addWidget(self.saveValuesBtn)
+
+        self.saveGearValuesBtn = QPushButton()
+        self.saveGearValuesBtn.setText("Save gears")
+        layout.addWidget(self.saveGearValuesBtn)
 
         #self.log = QTextEdit()
         #self.log.resize(100, 100)
@@ -138,8 +142,16 @@ class ControlGUI(QDialog):
 
         spinBox = QSpinBox()
         spinBox.setValue(0)
+        spinBox.setMaximum(1080)
+        spinBox.setMinimum(-1080)
         setattr(self, "velocity" + str(number), spinBox)
         layout.addWidget(spinBox)
+
+        spinBoxGear = QSpinBox()
+        spinBoxGear.setValue(0)
+        spinBoxGear.setMaximum(100)
+        setattr(self, "gear" + str(number), spinBoxGear)
+        layout.addWidget(spinBoxGear)
 
         parent.addItem(layout)
 

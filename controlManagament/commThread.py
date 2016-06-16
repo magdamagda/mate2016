@@ -9,7 +9,7 @@ class commThread(QThread):
     frameRecived = pyqtSignal(str)
     error = pyqtSignal(str)
 
-    def __init__(self, q = queue(), host = "localhost", port = 9998, delay = 0.2):
+    def __init__(self, q = queue(), host = "localhost", port = 9998, delay = 0.075):
         super(commThread, self).__init__()
         self.delay = delay
         self.host = host

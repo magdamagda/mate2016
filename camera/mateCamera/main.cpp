@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QString host = "192.168.1.171";
+    QString host = "192.168.1.170";
     int udpPort = 1234;
     int tcpPort = 6001;
     int width=640;

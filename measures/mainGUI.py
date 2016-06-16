@@ -7,7 +7,6 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-import chart
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -44,7 +43,7 @@ class Ui_MainWindow(QtGui.QDialog):
         self.measuresValues.addItem(spacerItem3, 0, 2, 1, 1)
         spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.measuresValues.addItem(spacerItem4, 0, 3, 1, 1)
-        self.measuresValues.setRowMinimumHeight(0, 100)
+        self.measuresValues.setRowMinimumHeight(0, 50)
         self.measuresValues.setColumnStretch(0, 1)
         self.measuresValues.setColumnStretch(1, 1)
         self.measuresValues.setColumnStretch(2, 1)
@@ -71,11 +70,12 @@ class Ui_MainWindow(QtGui.QDialog):
         spacerItem7 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.refreshForm.addItem(spacerItem7)
         self.mainLayout.addLayout(self.refreshForm)
-        self.chart = QtGui.QHBoxLayout()
-        self.chart.setMargin(11)
-        self.chart.setSpacing(6)
-        self.chart.setObjectName(_fromUtf8("chart"))
-        self.chartPlaceholder = chart.MyDynamicMplCanvas()
+        self.charts = QtGui.QGridLayout()
+        self.charts.setMargin(11)
+        self.charts.setSpacing(6)
+        self.charts.setObjectName(_fromUtf8("chart"))
+        self.charts.setRowMinimumHeight(0, 100)
+
         #sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
         #sizePolicy.setHorizontalStretch(0)
         #sizePolicy.setVerticalStretch(0)
@@ -83,17 +83,18 @@ class Ui_MainWindow(QtGui.QDialog):
         #self.chartPlaceholder.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(71)
-        self.chartPlaceholder.setFont(font)
-        self.chartPlaceholder.setObjectName(_fromUtf8("chartPlaceholder"))
-        self.chart.addWidget(self.chartPlaceholder)
-        self.legend = QtGui.QVBoxLayout()
-        self.legend.setMargin(11)
-        self.legend.setSpacing(6)
-        self.legend.setObjectName(_fromUtf8("legend"))
-        self.chart.addLayout(self.legend)
-        self.mainLayout.addLayout(self.chart)
+
+        self.mainLayout.addLayout(self.charts)
         self.mainLayout.setStretch(0, 5)
         self.mainLayout.setStretch(1, 1)
+        self.alert = QtGui.QLabel()
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        palette = QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.Foreground,QtCore.Qt.red)
+        self.alert.setPalette(palette)
+        self.alert.setFont(font)
+        self.mainLayout.addWidget(self.alert)
 
         self.retranslateUi()
 
